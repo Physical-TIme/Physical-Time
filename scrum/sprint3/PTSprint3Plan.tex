@@ -16,13 +16,13 @@
 	\Large{\textbf{Team: The Phyiscal Time Team}}\\
 	\Large{\textbf{Date: February 18, 2018}}\\
 	%\Large{\textbf{Revised: March 7, 2018}}\\
-	
+
 	\vspace{-3mm}
-	
+
 	\section{Goal}
 		\vspace{-3mm}
 		\tab \normalsize{In short, we want to be able for the user to manually configure an augmented clock of their own and display it accordingly. Along with this, we would like to see headway made with other features for the application, or dynamic placing of various icons around our clock to indicate the time of day based on the sun's location (e.g. sunrise, sunset, dusk, dawn, etc).}
-		
+
 
 	\section{Task Listing}
 		\vspace{-3mm}
@@ -30,7 +30,7 @@
 			\item As a user, I want to be able to enter my own values to manually augment the clock and see where the sun is based on the augmented clock (i.e. see what times sunrise, sunset, dusk, dawn occur according to the augmented clock).
 			\begin{itemize}
 			    \item Task 1: Create an HTML form so that the user can enter their information for the augmented clock (1 hour)
-			    \item Task 2: Create a JavaScript function to continually rebuild the clock object on each "submit" of the form (if the user enters invalid input, write JavaScript to inject HTML to prompt a pop-up to the user to tell them that they have input false/no information) (7 hours)
+			    \item Task 2: Create a JavaScript function to continually rebuild the clock object on each "submit" of the form (if the user enters invalid input, write JavaScript to inject HTML to prompt a pop up to the user to tell them that they have input false/no information) (7 hours)
 			\end{itemize}
 			Total: 8 hours
 			\item As a developer, I want to start on the visualization to show the user where the sun is relative to where they are on the Earth.
@@ -46,8 +46,15 @@
 			    \item Task 3: Dynamically inject HTML/CSS code to change the background (1 hour)
 			\end{itemize}
 			 Total: 10 hours
+			 \item As a user, I want to be able to change my clock to change from a regular noon time representation to a dawn time representation.
+			 \begin{itemize}
+				\item Task 1:  Calculate the angle offsets to switch form noon to dawn times (3 hours)
+				\item Task 2:  use the Solar library to find dawn start time for each display (3 hours)
+			\end{itemize}
+			Total: 6 hours
 		\end{itemize}
-		
+
+
 	\section{Team Roles}
 		\vspace{-3mm}
 		\begin{itemize}

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!--
-    Author: Cristian Gonzales
+    Co-author: Cristian Gonzales
+    Co-author: Tood Anderson
     Created for Physical Time, 2018
 -->
 <!--
@@ -38,8 +39,9 @@
         <meta name="msapplication-tap-highlight" content="no">
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
         <link rel="stylesheet" type="text/css" href="css/index.css">
-        <script type="text/javascript" src="lib/d3.v3.min.js"></script>
         <script type="text/javascript" src="lib/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="lib/d3.v3.min.js"></script>
+        <script type="text/javascript" src="lib/jquery.mask.js"></script>
         <script type="text/javascript" src="lib/suncalc.js"></script>
         <title>Physical Time</title>
     </head>
@@ -82,8 +84,10 @@
                       just the whitespace
             -->
             <a class="button clock-button clock-transition"></a>
-            <h1 class="clock-header">The clock.</h1>
-            <img src="img/clock.png" class="button-images clock-image"></img>
+            <a class="clock-transition">
+                <h1 class="clock-header">The clock.</h1>
+                <img src="img/clock.png" class="button-images clock-image"></img>
+            </a>
             <!-- <a class="button clock-button clock-transition"></a>
             <a class="clock-transition">
                 <h1 class="clock-header">The clock.</h1>
@@ -117,7 +121,9 @@
         <!--
             Clock page that lead from the original menu page
         -->
-        <div id="clock-face"></div>
+        <div id="clock-face">
+            <h1 id="init-clock-msg">Please enter a clock value in the settings page.</h1>
+        </div>
         <div id="clock-button">
             <a class="clock-back-button">BACK</a>
         </div>
@@ -128,16 +134,22 @@
         <div id="stats-back-btn">
             <a class="stats-back-button">BACK</a>
         </div>
-
+        <!--
+            Settings page that leads from the original menu page
+        -->
         <div id="settings-page">
-            <form method="post">
-                <input type="text" id="name" name="name" placeholder="Name">
-                <input type="text" id="email" name="email" placeholder="Email">
-                <input type="text" id="subject" name="subject" placeholder="Subject">
-                <input type="text" id="message" name="message" placeholder="Message">
-                <input type="submit" value="Submit">
+            <p id="settings-paragraph">Enter the amount of hours and minutes you would
+            like to augment the clock by. Please enter values between 0 and 24 for the
+            hour range, and values between 0 and 60 for the minute range.</p>
+            <form method="post" onsubmit="return false;">
+                <input type="text" id="form-hours" name="hours" placeholder="Hours">
+                <input type="text" id="form-minutes" name="minutes" placeholder="Minutes">
+                <input type="submit" value="Submit"
+                    onclick="checkUserInput($('#form-hours').val(), $('#form-minutes').val());">
             </form>
+            <a class="settings-back-button">BACK</a>
         </div>
+
         <script type="text/javascript" src="cordova.js"></script>
     </body>
 
@@ -203,6 +215,18 @@
         {
             // Initiate the background for the current time
             initBackground(getCurrentTime());
+            // Self-initializing mini helper function to help with the jQuery
+            // masking for our form under "Settings"
+            (function(){
+                $('#form-hours').mask('00', {'translation': {
+                        00: {pattern: /^(2[0-4]|1[0-9]|[1-9])$/}
+                    }
+                });
+                $('#form-minutes').mask('00', {'translation': {
+                        00: {pattern: /^[1-5]?[0-9]$/}
+                    }
+                });
+            })();
             // The time each div will fade in or out
             var fadeTime = 2000;
             // Fade into the landing page
@@ -227,16 +251,6 @@
                 $("#select-page").delay(fadeTime).fadeIn(fadeTime);
             });
 
-            /* After the user presses a button, a different div will be prompted
-             * with the selected feature
-             */
-            // On-click action for clock button (one click only)
-            $("a.clock-transition").one('click', function(event){
-                event.preventDefault();
-                // Show the clock in that div, and then fade-out and fade-in
-                // appropriately
-                showD3Clock();
-            });
             // The D3Clock will be made only once, but we will continually fade
             // in and out all the elements for this "page"
             $("a.clock-transition").click(function(event){
@@ -245,8 +259,6 @@
                 $("#clock-face").delay(fadeTime).fadeIn(fadeTime);
                 $("#clock-button").delay(fadeTime).fadeIn(fadeTime);
             });
-
-            // TODO: Unnamed "Feature" event listener
             // On-click action for stats button
             $("a.stats-transition").click(function(event){
                 event.preventDefault();
@@ -259,7 +271,7 @@
                 $("#stats-back-btn").delay(fadeTime).fadeIn(fadeTime);
             });
             // On-click action for settings button
-            $("a.settings-transition").one('click', function(event){
+            $("a.settings-transition").click(function(event){
                 event.preventDefault();
                 $("#select-page").fadeOut(fadeTime/4);
                 $("#settings-page").delay(fadeTime).fadeIn(fadeTime);
@@ -283,7 +295,39 @@
                 $("#stats-page").html("");
                 $("#select-page").delay(fadeTime).fadeIn(fadeTime);
             });
+            $("a.settings-back-button").click(function(event){
+                event.preventDefault();
+                $("#settings-page").fadeOut(fadeTime/4);
+                // $("#settings-back-button").fadeOut(fadeTime/4);
+                $("#select-page").delay(fadeTime).fadeIn(fadeTime);
+            });
         };
+
+        /* Helper function that is instantiated when the user clicks on the submit
+           button. If the values are correct, the helper function will instantiate the
+           showD3Clock() method.
+         */
+        function checkUserInput(hours, minutes)
+        {
+            if (hours < 1 || hours > 23 || minutes < 1 || minutes > 59)
+            {
+                navigator.notification.alert
+                (
+                    // message
+                    'Please give an hour value between 1-24 or a minute value between 1-60.',
+                    // callback
+                    function alertDismissed(){},
+                    // title
+                    'Sorry!',
+                    // buttonName
+                    'Done'
+                );
+            }
+            else
+            {
+                 showD3Clock(hours, minutes);
+            }
+        }
         /* Function to appropriate values to sunrise, sunset,
          */
         function initTimes()
@@ -382,7 +426,8 @@
             //     + "\nDusk: " + dusk
             //     + "\nNautical dusk: " + nauticalDusk
             //     + "\nNight start: " + nightStart
-            //     + "\nNadir: " + nadir);
+            //     + "\nNadir: " + nadir
+            //     + "\nCurrent time: " + new Date());
         }
         /* Function to get the current time from a JS Date() object
          */
@@ -498,7 +543,7 @@
         function getCurrentState(currentTime)
         {
             // Comparison for night time
-            if (currentTime >= nightStart && currentTime < nadir)
+            if ((currentTime >= "00:00:00" && currentTime < nadir) || currentTime >= nightStart)
             {
                 return "night";
             }
@@ -564,6 +609,7 @@
             // Uncaught error
             else
             {
+                alert("If this pop-up box pops up, there is a bug in your code!");
                 throw Error;
             }
         }
@@ -577,105 +623,108 @@
             if (stateString === "night")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>night</u>.<h1>"
-                    + "<h1 id=\"stats-time\"> Night started at " + nightStart + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>nadir</u> at " + nadir + ".</h1>"
-                    + "<p id=\"stats-paragraph\">We consider it night when it is dark enough for astronomical observations.</p>"
+                    + "<p id=\"stats-paragraph\"> Night started at " + nightStart + ". "
+                    + "The next occurence will be <u>nadir</u> at " + nadir + ". "
+                    + "We consider it night when it is dark enough for astronomical observations.</p>"
             }
             else if (stateString === "nadir")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>nadir</u>.<h1>"
-                    + "<h1 id=\"stats-time\"> Nadir started at " + nadir + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>small hours</u> at " + nightEnd + ".</h1>"
-                    + "<p id=\"stats-paragraph\">Nadir is the darkest moment of the night, where the sun is in its lowest position.</p>"
+                    + "<p id=\"stats-paragraph\"> Nadir started at " + nadir + ". "
+                    + "The next occurence will be <u>small hours</u> at " + nightEnd + ". "
+                    + "Nadir is the darkest moment of the night, where the sun is in its lowest position.</p>"
             }
             else if (stateString === "small hours")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>small hours</u>.<h1>"
-                    + "<h1 id=\"stats-time\"> Small hours started at " + nightEnd + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>dawn</u> at " + dawn + ".</h1>"
-                    + "<p id=\"stats-paragraph\">Small hours is the early hours of the morning, after midnight and before dawn.</p>"
+                    + "<p id=\"stats-paragraph\"> Small hours started at " + nightEnd + ". "
+                    + "The next occurence will be <u>dawn</u> at " + dawn + ". "
+                    + "Small hours is the early hours of the morning, after midnight and before dawn.</p>"
             }
             else if (stateString === "dawn")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>dawn</u>.<h1>"
-                    + "<h1 id=\"stats-time\">Dawn started at " + dawn + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>sunrise</u> at " + sunrise + ".</h1>"
-                    + "<p id=\"stats-paragraph\">Dawn is defined as when the morning nautical twilight ends, and morning civil twilight starts.</p>"
+                    + "<p id=\"stats-paragraph\">Dawn started at " + dawn + ". "
+                    + "The next occurence will be <u>sunrise</u> at " + sunrise + ". "
+                    + "Dawn is defined as when the morning nautical twilight ends, and morning civil twilight starts.</p>"
             }
             else if (stateString === "sunrise")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>sunrise</u>.<h1>"
-                    + "<h1 id=\"stats-time\">Sunrise started at " + sunrise + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>the morning golden hour</u> at " + morningGoldenHour + ".</h1>"
-                    + "<p id=\"stats-paragraph\">Sunrise occurs when the top edge of the sun appears on the horizon.</p>"
+                    + "<p id=\"stats-paragraph\">Sunrise started at " + sunrise + ". "
+                    + "The next occurence will be <u>the morning golden hour</u> at " + morningGoldenHour + ". "
+                    + "Sunrise occurs when the top edge of the sun appears on the horizon.</p>"
             }
             else if (stateString === "sunrise end")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>the end of sunrise</u>.<h1>"
-                    + "<h1 id=\"stats-time\">Sunrise ended at " + sunriseEnd + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>the morning golden hour</u> at " + morningGoldenHour + ".</h1>"
-                    + "<p id=\"stats-paragraph\">Sunrise occurs when the top edge of the sun appears on the horizon.</p>"
+                    + "<p id=\"stats-paragraph\">Sunrise ended at " + sunriseEnd + ". "
+                    + "The next occurence will be <u>the morning golden hour</u> at " + morningGoldenHour + ". "
+                    + "Sunrise occurs when the top edge of the sun appears on the horizon.</p>"
             }
             else if (stateString === "morning golden hour")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>the morning golden hour</u>.<h1>"
-                    + "<h1 id=\"stats-time\">The morning golden hour started at " + morningGoldenHour + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>solar noon</u> at " + solarNoon + ".</h1>"
-                    + "<p id=\"stats-paragraph\">The morning golden hour is considered soft light by the sun and the best time for photography.</p>"
+                    + "<p id=\"stats-paragraph\">The morning golden hour started at " + morningGoldenHour + ". "
+                    + "The next occurence will be <u>solar noon</u> at " + solarNoon + ". "
+                    + "The morning golden hour is considered soft light by the sun and the best time for photography.</p>"
             }
             else if (stateString === "solar noon")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>solar noon</u>.<h1>"
-                    + "<h1 id=\"stats-time\">Solar noon started at " + solarNoon + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>the evening golden hour</u> at " + eveningGoldenHour + ".</h1>"
-                    + "<p id=\"stats-paragraph\">We are considered in solar noon when the sun is in the highest position.</p>"
+                    + "<p id=\"stats-paragraph\">Solar noon started at " + solarNoon + ". "
+                    + "The next occurence will be <u>the evening golden hour</u> at " + eveningGoldenHour + ". "
+                    + "We are considered in solar noon when the sun is in the highest position.</p>"
             }
             else if (stateString === "evening golden hour")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>the evening golden hour</u>.<h1>"
-                    + "<h1 id=\"stats-time\">The evening golden hour started at " + eveningGoldenHour + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>sunset</u> at " + sunsetStart + ".</h1>"
-                    + "<p id=\"stats-paragraph\">The evening golden hour is considered soft light by the sun and the best time for photography prior to sunset.</p>"
+                    + "<p id=\"stats-paragraph\">The evening golden hour started at " + eveningGoldenHour + ". "
+                    + "The next occurence will be <u>sunset</u> at " + sunsetStart + ". "
+                    + "The evening golden hour is considered soft light by the sun and the best time for photography prior to sunset.</p>"
             }
             else if (stateString === "sunset")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>sunset</u>.<h1>"
-                    + "<h1 id=\"stats-time\">Sunset started at " + sunsetStart + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>the evening twilight</u> at " + sunsetEnd + ".</h1>"
-                    + "<p id=\"stats-paragraph\">Sunset is when the sun disappears below the horizon and evening civil twilight starts.</p>"
+                    + "<p id=\"stats-paragraph\">Sunset started at " + sunsetStart + ". "
+                    + "The next occurence will be <u>the evening twilight</u> at " + sunsetEnd + ". "
+                    + "Sunset is when the sun disappears below the horizon and evening civil twilight starts.</p>"
             }
             else if (stateString === "evening twilight")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>evening twilight</u>.<h1>"
-                    + "<h1 id=\"stats-time\">Evening twilight started at " + sunsetEnd + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>dusk</u> at " + dusk + ".</h1>"
-                    + "<p id=\"stats-paragraph\">Evening twilight is when the sun fully submerges before the horizon, right before dusk.</p>"
+                    + "<p id=\"stats-paragraph\">Evening twilight started at " + sunsetEnd + ". "
+                    + "The next occurence will be <u>dusk</u> at " + dusk + ". "
+                    + "Evening twilight is when the sun fully submerges before the horizon, right before dusk.</p>"
             }
             else if (stateString === "dusk")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>dusk</u>.<h1>"
-                    + "<h1 id=\"stats-time\">Dusk started at " + dusk + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>nautical dusk</u> at " + nauticalDusk + ".</h1>"
-                    + "<p id=\"stats-paragraph\">Dusk is when the evening nautical twilight starts.</p>"
+                    + "<p id=\"stats-paragraph\">Dusk started at " + dusk + ". "
+                    + "The next occurence will be <u>nautical dusk</u> at " + nauticalDusk + ". "
+                    + "Dusk is when the evening nautical twilight starts.</p>"
             }
             else if (stateString === "nautical dusk")
             {
                 return "<h1 id=\"stats-header\">The current state based on the sun's movements is <u>nautical dusk</u>.<h1>"
-                    + "<h1 id=\"stats-time\">Nautical dusk started at " + nauticalDusk + ".</h1>"
-                    + "<h1 id=\"stats-next\">The next occurence will be <u>the beginning of night</u> at " + nightStart + ".</h1>"
-                    + "<p id=\"stats-paragraph\">Nautical dusk is when the evening astronomical twilight starts.</p>"
+                    + "<p id=\"stats-paragraph\">Nautical dusk started at " + nauticalDusk + ". "
+                    + "The next occurence will be <u>the beginning of night</u> at " + nightStart + ". "
+                    + "Nautical dusk is when the evening astronomical twilight starts.</p>"
             }
             // Uncaught error
             else
             {
+                alert("If this pop-up box pops up, there is a bug in your code!");
                 throw Error;
             }
         }
 
         /* Function to show the D3 clock
-         * TODO: Alignment and CSS features
          */
-        var showD3Clock = function() {
+        var showD3Clock = function(initHours, initMinutes) {
+          // We rebuild every time this function is called
+          $("#clock-face").html("");
+
           var w = 320             // Width of SVG element
           var h = 320             // Height of SVG element
 
@@ -713,14 +762,15 @@
           // ...
           // after implementing the clock, a faster hand has been added
           // now we can update every 2.7 seconds and see a change
-          setInterval(updateHands, 2700)
+          hourChange = ((86400 * 1000) / (initHours * initMinutes * initMinutes * initMinutes));
+          setInterval(updateHands, hourChange)
 
           function makeClockFace() {
             var hourTickLength = Math.round(r * 0.2)
             var minuteTickLength = Math.round(r * 0.075)
-            for (var i = 0; i < 20; ++i) {
+            for (var i = 0; i < initMinutes; ++i) {
               var tickLength, tickClass
-              if ((i % 5) == 0) {
+              if (i % (360 / (86400 / (initMinutes * 60))) == 0) {
                 tickLength = hourTickLength
                 tickClass = "hourtick"
               }
@@ -734,7 +784,7 @@
                 .attr("y1", margin)
                 .attr("x2", cx)
                 .attr("y2", margin + tickLength)
-                .attr("transform", "rotate(" + i * 18 + "," + cx + "," + cy + ")")
+                .attr("transform", "rotate(" + i * (360 / initMinutes) + "," + cx + "," + cy + ")")
             }
           }
 
@@ -751,24 +801,26 @@
             // now we find the custom hour/minute/second for this clock
 
             // if this clock counts 4 hours in a day, we need this figure in seconds
-            let quarterDayInSeconds = 21600
-            var customHour = secondsToday / quarterDayInSeconds
+            // (there are 86400 hours in a day)
+            let hourDayInSeconds = 86400 / initHours
+            var customHour = secondsToday / hourDayInSeconds
 
             // dividing each hour into 20 minutes, that's 1/80th a day in seconds
             // we need to use modulus to end up with a figure between 1 and 20
-            let eightiethDayInSeconds = 1080
-            var customMinute = (secondsToday / eightiethDayInSeconds) % 20
+            let minuteDayInSeconds = initMinutes * 60
+            var customMinute = (secondsToday / minuteDayInSeconds) % initMinutes
 
+            // TODO
             // now we divide each minute into 20 portions as well to find the count for the seconds hand
             // 24hoursinseconds / (4 * 20 * 20) = 86,400 / 1600 = 54
-            let secondsRate = 54
-            var customSeconds = ( secondsToday / secondsRate ) % 20
+            let secondsRate = 86400 / (initHours * initMinutes * initMinutes)
+            var customSeconds = ( secondsToday / secondsRate ) % initMinutes
 
             // finally lets add a fourth hand so we can see some movement
             // it'll count 20 paces around the clock for each "second" here
             // 86400 / (4*20*20*20) = 86400 / 32000 = 2.7
-            let mellowRate = 2.7
-            var mellowTick = ( secondsToday / mellowRate ) % 20
+            let mellowRate = 86400 / (initHours * initMinutes * initMinutes * initMinutes)
+            var mellowTick = ( secondsToday / mellowRate ) % initMinutes
 
             console.log("custom h.m.s %d:%d:%d:%d", customHour, customMinute, customSeconds, mellowTick)
             // and then
@@ -776,7 +828,7 @@
               [ "hour",   customHour ],
               [ "minute", customMinute ],
               [ "second", customSeconds ],
-              [ "mellow", mellowTick ]
+              // [ "mellow", mellowTick ]
             ]
           }
 
@@ -798,14 +850,14 @@
           // you the hour hand behving at its own rate
           // the minute and second hand both go around via digits 1-20
           function rotationTransform(d) {
-            var angle
+            var angle;
             // what portion of 360 degrees is this hour at on the clockface?
             // 4 hours for the whole day. 1 hour = 1/4 of 360, or 90 degrees:
             if (d[0] == "hour")
-              angle = d[1] * 90
+              angle = d[1] * (360 / initHours);
             else
               // minutes and seconds go 1/20th of 360 per digit. 360/20 = 18
-              angle = d[1] * 18
+              angle = d[1] * (360 / initMinutes);
             return "rotate(" + angle + "," + cx + "," + cy + ")"
           }
 

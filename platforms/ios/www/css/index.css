@@ -398,33 +398,16 @@ svg.clock
     transform: translateX(-50%) translateY(-50%);
 }
 
+#init-clock-msg
+{
+    font-size: 30px;
+    font-family: 'Zilla Slab Highlight', cursive;
+    color: black;
+}
+
 /* Styling for the form
  */
-#name
-{
-    position: absolute;
-    top: 25%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-}
-
-#email
-{
-    position: absolute;
-    top: 35%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-}
-
-#subject
-{
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-}
-
-#message
+#form-hours
 {
     position: absolute;
     top: 55%;
@@ -432,15 +415,23 @@ svg.clock
     transform: translateX(-50%) translateY(-50%);
 }
 
+#form-minutes
+{
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
 input[type=text]
 {
-    width: 75%;
+    width: 40%;
     padding: 12px 20px;
     margin: 8px 0;
     box-sizing: border-box;
 
     font-family: 'Zilla Slab Highlight', cursive;
-    font-size: 15px;
+    font-size: 30px;
 }
 
 input[type=submit]
@@ -457,7 +448,7 @@ input[type=submit]
     font-size: 10px;
 
     position: absolute;
-    top: 85%;
+    top: 80%;
     left: 50%;
     transform: translateX(-50%) translateY(-50%);
 }
@@ -467,7 +458,7 @@ input[type=submit]
 .clock-back-button
 {
     position: absolute;
-    top: 90%;
+    top: 85%;
     left: 50%;
     transform: translateX(-50%) translateY(-50%);
 
@@ -502,6 +493,26 @@ input[type=submit]
     font-family: 'Zilla Slab Highlight', cursive;
 }
 
+/* Styling for the "BACK" button where the stats page is
+ */
+.settings-back-button
+{
+    position: absolute;
+    top: 90%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+
+    background-color: white;
+    border-radius: 10px;
+    color: black;
+    padding: 10px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'Zilla Slab Highlight', cursive;
+}
+
 /* All styling for the stats headers and paragraphs
  */
 #stats-header
@@ -516,7 +527,7 @@ input[type=submit]
     color: black;
 }
 
-#stats-time
+#stats-paragraph
 {
     position: absolute;
     top: 35%;
@@ -528,26 +539,16 @@ input[type=submit]
     color: black;
 }
 
-#stats-next
+/* Styling for the settings paragraph
+ */
+#settings-paragraph
 {
     position: absolute;
-    top: 45%;
+    top: 10%;
     padding-left: 15px;
     padding-right: 15px;
 
-    font-size: 20px;
-    font-family: 'Zilla Slab Highlight', cursive;
-    color: black;
-}
-
-#stats-paragraph
-{
-    position: absolute;
-    top: 55%;
-    padding-left: 15px;
-    padding-right: 15px;
-
-    font-size: 10px;
+    font-size: 25px;
     font-family: 'Zilla Slab Highlight', cursive;
     color: black;
 }
